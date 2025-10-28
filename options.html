@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Polyglot Options</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 24px auto; padding: 0 12px; }
+    h1 { font-size: 20px; }
+    label { display:block; margin: 10px 0 4px; }
+    input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    button { margin-top: 12px; padding: 8px 12px; border: 0; border-radius: 6px; background: #2563eb; color: #fff; cursor: pointer; }
+    .hint { color: #666; font-size: 12px; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <h1>Polyglot Options</h1>
+  <div class="row">
+    <div>
+      <label>Provider</label>
+      <select id="provider">
+        <option value="gemini">Gemini</option>
+        <option value="openai">OpenAI</option>
+        <option value="none">None (only built-in + LanguageTool)</option>
+      </select>
+    </div>
+    <div>
+      <label>Model</label>
+      <input id="model" placeholder="gemini-1.5-flash or gpt-4o-mini">
+    </div>
+  </div>
+  <label>API Key</label>
+  <input id="apiKey" placeholder="Paste your API key (kept local)">
+  <div class="hint">Used only for panel features and (optionally) higher-quality grammar checks.</div>
+
+  <label style="margin-top:12px;">YouTube Data API Key (optional)</label>
+  <input id="ytKey" placeholder="For video previews in Find Sources">
+
+  <button id="save">Save</button>
+  <div id="status" class="hint"></div>
+
+  <script>
+    (async function (){
+      const opts = (await chrome.storage.local.get('polyglot_opts'))?.polyglot_opts || {};
+      provider.value = opts.provider || 'none';
+      model.value = opts.model || '';
+      apiKey.value = opts.apiKey || '';
+      ytKey.value = opts.ytKey || '';
+      save.onclick = async () => {
+        await chrome.storage.local.set({ polyglot_opts: {
+          provider: provider.value.trim(),
+          model: model.value.trim(),
+          apiKey: apiKey.value.trim(),
+          ytKey: ytKey.value.trim()
+        }});
+        status.textContent = 'Saved.';
+        setTimeout(()=>status.textContent='', 1500);
+      };
+    })();
+  </script>
+</body>
+</html>
